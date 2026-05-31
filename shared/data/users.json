@@ -1,0 +1,56 @@
+[
+  {
+    "id": "USR-ADMIN-001",
+    "username": "admin",
+    "passwordHash": "__SEED__admin123",
+    "role": "admin",
+    "name": "System Administrator",
+    "email": "admin@university.edu",
+    "courses": []
+  },
+  {
+    "id": "USR-TCH-001",
+    "username": "teacher1",
+    "passwordHash": "__SEED__pass123",
+    "role": "teacher",
+    "name": "Dr. John Smith",
+    "email": "jsmith@university.edu",
+    "courses": ["CS101", "CS201", "CS401"]
+  },
+  {
+    "id": "USR-TCH-002",
+    "username": "teacher2",
+    "passwordHash": "__SEED__pass123",
+    "role": "teacher",
+    "name": "Dr. Jane Doe",
+    "email": "jdoe@university.edu",
+    "courses": ["CS301", "MATH101"]
+  },
+  {
+    "id": "USR-STU-001",
+    "username": "student1",
+    "passwordHash": "__SEED__pass123",
+    "role": "student",
+    "name": "Alice Johnson",
+    "email": "alice@student.edu",
+    "courses": ["CS101", "CS201", "CS401"]
+  },
+  {
+    "id": "USR-STU-002",
+    "username": "student2",
+    "passwordHash": "__SEED__pass123",
+    "role": "student",
+    "name": "Bob Williams",
+    "email": "bob@student.edu",
+    "courses": ["CS101", "CS301", "MATH101"]
+  },
+  {
+    "id": "USR-STU-003",
+    "username": "student3",
+    "passwordHash": "__SEED__pass123",
+    "role": "student",
+    "name": "Carol Davis",
+    "email": "carol@student.edu",
+    "courses": ["CS201", "CS401"]
+  }
+]

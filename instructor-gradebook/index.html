@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Instructor GradeBook — Assignment Submission System</title>
+  <meta name="description" content="Instructor dashboard — view your course submissions, set deadlines, and export records."/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-brand">
+      <div class="brand-icon">📋</div>
+      <div>
+        <div class="brand-name">AssignTrack — Instructor GradeBook</div>
+        <div class="brand-tagline">Subsystem 3 — Course Submission Management</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <span id="engine-status" class="engine-badge offline">⏳ Connecting…</span>
+      <div id="user-info" style="display:none;" class="user-pill">
+        <span id="user-name-display"></span>
+        <button id="btn-logout" class="btn-sm">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-content" id="main">
+
+    <!-- ── LOGIN PANEL ── -->
+    <section id="login-panel" class="auth-card animate-slide-up">
+      <div class="auth-icon">🔒</div>
+      <h1>Instructor Login</h1>
+      <p>Sign in with your faculty credentials to access your course submissions.</p>
+      <form id="login-form" novalidate>
+        <div class="form-group">
+          <label for="login-username">Username</label>
+          <input id="login-username" type="text" class="form-input" placeholder="e.g. teacher1" autocomplete="username" required/>
+        </div>
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input id="login-password" type="password" class="form-input" placeholder="Your password" autocomplete="current-password" required/>
+        </div>
+        <div id="login-error" class="form-error" style="display:none;"></div>
+        <button type="submit" id="btn-login" class="btn-submit">🔑 Sign In</button>
+      </form>
+      <p class="auth-hint">
+        Demo: <code>teacher1</code> / <code>pass123</code> (CS101, CS201, CS401)<br/>
+        or &nbsp;<code>teacher2</code> / <code>pass123</code> (CS301, MATH101)
+      </p>
+    </section>
+
+    <!-- ── DASHBOARD (shown after login) ── -->
+    <section id="dashboard" style="display:none;">
+
+      <div class="page-title-row">
+        <h1 id="dashboard-title">My Course Submissions</h1>
+        <p>Showing only submissions for <strong id="teacher-courses-label">your courses</strong>. Auto-refreshes every 30 s.</p>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card total"    data-filter-status="ALL"      role="button" tabindex="0"><div class="stat-icon">📊</div><div><div class="stat-value" id="stat-total">—</div><div class="stat-label">Total</div></div></div>
+        <div class="stat-card on-time"  data-filter-status="ON_TIME"  role="button" tabindex="0"><div class="stat-icon">✅</div><div><div class="stat-value" id="stat-ontime">—</div><div class="stat-label">On Time</div></div></div>
+        <div class="stat-card late"     data-filter-status="LATE"     role="button" tabindex="0"><div class="stat-icon">⚠️</div><div><div class="stat-value" id="stat-late">—</div><div class="stat-label">Late</div></div></div>
+        <div class="stat-card rejected" data-filter-status="REJECTED" role="button" tabindex="0"><div class="stat-icon">❌</div><div><div class="stat-value" id="stat-rejected">—</div><div class="stat-label">Rejected</div></div></div>
+      </div>
+
+      <!-- Action bar -->
+      <div class="action-bar">
+        <div id="filters-bar">
+          <label for="filter-course">Course</label>
+          <select id="filter-course" class="filter-select"><option value="ALL">All My Courses</option></select>
+          <label for="filter-status">Status</label>
+          <select id="filter-status" class="filter-select">
+            <option value="ALL">All Statuses</option>
+            <option value="ON_TIME">On Time</option>
+            <option value="LATE">Late</option>
+            <option value="REJECTED">Rejected</option>
+          </select>
+          <input type="search" id="search-input" class="search-input" placeholder="🔍 Search student, file, receipt…"/>
+          <span id="result-count" aria-live="polite">Loading…</span>
+        </div>
+        <div class="action-btns">
+          <button id="btn-refresh" class="btn-action">🔄 Refresh</button>
+          <button id="btn-export"  class="btn-action teal">⬇ Export CSV</button>
+          <button id="btn-deadlines" class="btn-action purple">📅 Manage Deadlines</button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div id="table-container"></div>
+
+      <!-- Deadline Manager Panel -->
+      <div id="deadline-panel" style="display:none;" class="deadline-panel">
+        <div class="deadline-panel-header">
+          <h3>📅 Manage Assignment Deadlines</h3>
+          <button id="btn-close-deadlines" class="btn-sm">✕ Close</button>
+        </div>
+        <p class="deadline-hint">Set or update submission deadlines for your assignments. Changes take effect immediately.</p>
+        <div id="deadline-list"></div>
+      </div>
+
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    AssignTrack — Instructor GradeBook | Patterns: Singleton · Builder · Factory · Facade · Template Method · Observer · Proxy · Strategy · Chain of Responsibility · Command
+  </footer>
+</div>
+
+<script src="js/AuthClient.js"></script>
+<script src="js/FilterStrategy.js"></script>
+<script src="js/GradeBookClient.js"></script>
+<script src="js/SubmissionRenderer.js"></script>
+<script src="js/ExportManager.js"></script>
+<script src="js/DeadlineManager.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

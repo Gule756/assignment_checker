@@ -1,0 +1,37 @@
+[
+  {
+    "id": "CS101",
+    "name": "Introduction to Programming",
+    "teacherId": "USR-TCH-001",
+    "teacherName": "Dr. John Smith",
+    "description": "Fundamentals of programming using Python and Java."
+  },
+  {
+    "id": "CS201",
+    "name": "Data Structures & Algorithms",
+    "teacherId": "USR-TCH-001",
+    "teacherName": "Dr. John Smith",
+    "description": "Arrays, linked lists, trees, graphs and algorithm analysis."
+  },
+  {
+    "id": "CS301",
+    "name": "Software Engineering",
+    "teacherId": "USR-TCH-002",
+    "teacherName": "Dr. Jane Doe",
+    "description": "SDLC, requirements, design, testing and project management."
+  },
+  {
+    "id": "CS401",
+    "name": "Design Patterns & Architecture",
+    "teacherId": "USR-TCH-001",
+    "teacherName": "Dr. John Smith",
+    "description": "GoF design patterns, component-based and distributed architecture."
+  },
+  {
+    "id": "MATH101",
+    "name": "Calculus I",
+    "teacherId": "USR-TCH-002",
+    "teacherName": "Dr. Jane Doe",
+    "description": "Limits, derivatives, integrals and their applications."
+  }
+]

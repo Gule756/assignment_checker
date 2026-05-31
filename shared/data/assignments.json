@@ -1,0 +1,56 @@
+[
+  {
+    "id": "ASGN-CS101-01",
+    "courseId": "CS101",
+    "title": "Lab 1 — Hello World & Variables",
+    "description": "Write a program that prints your name, student ID, and today's date. Submit as .py or .java file.",
+    "deadline": "2026-06-15T23:59:00.000Z",
+    "allowedTypes": ["py", "java", "zip", "pdf", "txt"],
+    "maxFileSizeMB": 5
+  },
+  {
+    "id": "ASGN-CS101-02",
+    "courseId": "CS101",
+    "title": "Assignment 1 — Control Flow",
+    "description": "Implement a grade calculator using if/else and loops. Submit source code + report.",
+    "deadline": "2026-06-30T23:59:00.000Z",
+    "allowedTypes": ["py", "java", "zip", "pdf", "docx"],
+    "maxFileSizeMB": 10
+  },
+  {
+    "id": "ASGN-CS201-01",
+    "courseId": "CS201",
+    "title": "Project 1 — Linked List Implementation",
+    "description": "Implement a doubly linked list with insert, delete, search operations.",
+    "deadline": "2026-06-20T23:59:00.000Z",
+    "allowedTypes": ["java", "py", "cpp", "zip", "pdf"],
+    "maxFileSizeMB": 10
+  },
+  {
+    "id": "ASGN-CS301-01",
+    "courseId": "CS301",
+    "title": "SRS Document — Group Project",
+    "description": "Submit your Software Requirements Specification document for the group project.",
+    "deadline": "2026-05-30T23:59:00.000Z",
+    "allowedTypes": ["pdf", "docx"],
+    "maxFileSizeMB": 20
+  },
+  {
+    "id": "ASGN-CS401-01",
+    "courseId": "CS401",
+    "title": "Design Patterns Implementation",
+    "description": "Implement at least 5 GoF design patterns in a mini-project. Submit full source code and documentation.",
+    "deadline": "2026-07-01T23:59:00.000Z",
+    "allowedTypes": ["zip", "pdf", "docx", "pptx", "ppt"],
+    "maxFileSizeMB": 25
+  },
+  {
+    "id": "ASGN-MATH101-01",
+    "courseId": "MATH101",
+    "title": "Problem Set 1 — Limits",
+    "description": "Solve the 20 limit problems in the handout. Show all working steps.",
+    "deadline": "2026-06-10T23:59:00.000Z",
+    "allowedTypes": ["pdf", "docx", "jpg", "png"],
+    "maxFileSizeMB": 10
+  }
+]

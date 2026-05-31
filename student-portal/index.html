@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Portal — Assignment Submission</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0d0f1a; --surface: #161929; --card: #1e2235; --border: #2a2f4a;
+      --primary: #6c63ff; --primary-glow: rgba(108,99,255,.25);
+      --green: #22d3a5; --yellow: #f0b429; --red: #f87171;
+      --text: #e2e8f0; --muted: #7c8db5; --radius: 14px;
+    }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; flex-direction:column; align-items:center; }
+
+    /* AUTH */
+    #auth-screen { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; width:100%; padding:24px; }
+    #dashboard   { display:none; width:100%; max-width:920px; padding:28px 20px 60px; }
+
+    .brand { text-align:center; margin-bottom:32px; }
+    .brand h1 { font-size:1.9rem; font-weight:700; background:linear-gradient(135deg,#6c63ff,#22d3a5); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .brand p  { color:var(--muted); margin-top:6px; font-size:.9rem; }
+
+    .auth-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:36px 32px; width:100%; max-width:420px; box-shadow:0 24px 60px rgba(0,0,0,.5); }
+
+    .tab-row { display:flex; gap:8px; margin-bottom:28px; }
+    .tab-btn { flex:1; padding:10px; border:1px solid var(--border); background:transparent; color:var(--muted); border-radius:8px; cursor:pointer; font-size:.9rem; font-family:inherit; transition:all .2s; }
+    .tab-btn.active { background:var(--primary); border-color:var(--primary); color:#fff; font-weight:600; }
+
+    label { display:block; font-size:.82rem; color:var(--muted); margin-bottom:6px; margin-top:16px; text-transform:uppercase; letter-spacing:.04em; }
+    input, select { width:100%; padding:11px 14px; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--text); font-family:inherit; font-size:.95rem; outline:none; transition:border-color .2s; }
+    input:focus, select:focus { border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-glow); }
+    select option { background:var(--surface); }
+
+    /* File upload drop zone */
+    .file-zone {
+      width:100%; min-height:90px; padding:20px;
+      background:var(--surface); border:2px dashed var(--border);
+      border-radius:8px; cursor:pointer; text-align:center;
+      transition:border-color .2s, background .2s; position:relative;
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+    }
+    .file-zone:hover, .file-zone.drag { border-color:var(--primary); background:rgba(108,99,255,.06); }
+    .file-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+    .file-zone .icon { font-size:1.6rem; }
+    .file-zone .hint { font-size:.82rem; color:var(--muted); }
+    .file-zone .chosen { font-size:.88rem; color:var(--green); font-weight:500; }
+
+    .btn { width:100%; padding:13px; margin-top:24px; background:linear-gradient(135deg,#6c63ff,#5a54e8); border:none; border-radius:8px; color:#fff; font-size:1rem; font-weight:600; font-family:inherit; cursor:pointer; transition:opacity .2s, transform .1s; }
+    .btn:hover { opacity:.9; } .btn:active { transform:scale(.99); } .btn:disabled { opacity:.5; cursor:not-allowed; }
+
+    .msg { margin-top:14px; padding:10px 14px; border-radius:8px; font-size:.88rem; display:none; }
+    .msg.error   { background:rgba(248,113,113,.12); border:1px solid var(--red);   color:var(--red);   display:block; }
+    .msg.success { background:rgba(34,211,165,.12);  border:1px solid var(--green); color:var(--green); display:block; }
+
+    /* Dashboard */
+    .topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:32px; flex-wrap:wrap; gap:12px; }
+    .topbar h2 { font-size:1.4rem; font-weight:700; }
+    .user-chip { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:6px 16px; font-size:.85rem; color:var(--muted); display:flex; align-items:center; gap:8px; }
+    .dot { width:8px; height:8px; background:var(--green); border-radius:50%; }
+    .logout-btn { background:transparent; border:1px solid var(--border); color:var(--muted); padding:6px 14px; border-radius:8px; cursor:pointer; font-family:inherit; font-size:.85rem; transition:all .2s; }
+    .logout-btn:hover { border-color:var(--red); color:var(--red); }
+
+    .panel { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:28px; margin-bottom:28px; }
+    .panel h3 { font-size:1rem; font-weight:600; margin-bottom:4px; }
+    .panel .sub-label { font-size:.82rem; color:var(--muted); margin-bottom:20px; }
+
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    @media(max-width:600px){ .form-row { grid-template-columns:1fr; } }
+
+    /* Receipt */
+    #receipt-box { display:none; margin-top:20px; background:linear-gradient(135deg,rgba(108,99,255,.08),rgba(34,211,165,.06)); border:1px solid var(--primary); border-radius:var(--radius); padding:20px; animation:fadeIn .4s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+    .receipt-id { font-size:1.1rem; font-weight:700; color:var(--primary); margin-bottom:8px; }
+    .receipt-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+    .receipt-item .r-label { font-size:.75rem; color:var(--muted); text-transform:uppercase; }
+    .receipt-item .r-value { font-size:.92rem; font-weight:500; }
+
+    /* Progress bar */
+    .progress-wrap { margin-top:16px; display:none; }
+    .progress-bar { height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
+    .progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--green)); border-radius:3px; width:0%; transition:width .3s; }
+    .progress-label { font-size:.78rem; color:var(--muted); margin-top:6px; }
+
+    /* History table */
+    table { width:100%; border-collapse:collapse; font-size:.88rem; }
+    thead th { padding:10px 14px; text-align:left; color:var(--muted); font-weight:600; font-size:.78rem; text-transform:uppercase; border-bottom:1px solid var(--border); }
+    tbody td { padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.04); }
+    tbody tr:hover { background:rgba(255,255,255,.02); }
+
+    .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:.75rem; font-weight:600; }
+    .badge.ON_TIME  { background:rgba(34,211,165,.15); color:var(--green); }
+    .badge.LATE     { background:rgba(240,180,41,.15);  color:var(--yellow); }
+    .badge.REJECTED { background:rgba(248,113,113,.15); color:var(--red); }
+
+    .dl-link { color:var(--primary); font-size:.8rem; text-decoration:none; }
+    .dl-link:hover { text-decoration:underline; }
+    .empty { text-align:center; padding:40px; color:var(--muted); }
+    .spinner { display:inline-block; width:16px; height:16px; border:2px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%; animation:spin .6s linear infinite; vertical-align:middle; margin-right:6px; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+  </style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+  <div class="brand">
+    <h1>Assignment Portal</h1>
+    <p>Digital Assignment Submission &amp; Receipt Validation</p>
+  </div>
+  <div class="auth-card">
+    <div class="tab-row">
+      <button class="tab-btn active" id="tab-login"    onclick="showTab('login')">Login</button>
+      <button class="tab-btn"        id="tab-register" onclick="showTab('register')">Sign Up</button>
+    </div>
+    <div id="form-login">
+      <label>Email</label>
+      <input id="l-email" type="email" placeholder="student@university.edu"/>
+      <label>Password</label>
+      <input id="l-pass"  type="password" placeholder="••••••••"/>
+      <button class="btn" id="btn-login" onclick="doLogin()">Login</button>
+    </div>
+    <div id="form-register" style="display:none">
+      <label>Full Name</label>
+      <input id="r-name"  type="text"     placeholder="Your full name"/>
+      <label>Email</label>
+      <input id="r-email" type="email"    placeholder="student@university.edu"/>
+      <label>Password</label>
+      <input id="r-pass"  type="password" placeholder="Min 6 characters"/>
+      <button class="btn" id="btn-register" onclick="doRegister()">Create Student Account</button>
+    </div>
+    <div id="auth-msg" class="msg"></div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="topbar">
+    <h2>My Submissions</h2>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <div class="user-chip"><span class="dot"></span><span id="user-name">Student</span></div>
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- Submit form -->
+  <div class="panel">
+    <h3>Submit New Assignment</h3>
+    <p class="sub-label">Fill in your details, select a course, and upload your assignment file (any format accepted).</p>
+
+    <div class="form-row">
+      <div>
+        <label>Full Name</label>
+        <input id="s-fullname" type="text" placeholder="Your full name as on ID"/>
+      </div>
+      <div>
+        <label>Student ID Number</label>
+        <input id="s-studentid" type="text" placeholder="e.g. STU-2024-001"/>
+      </div>
+    </div>
+
+    <div class="form-row" style="margin-top:0">
+      <div>
+        <label>Course</label>
+        <select id="s-course">
+          <option value="CS401">CS401 — Design Patterns</option>
+          <option value="CS301">CS301 — Software Engineering</option>
+          <option value="CS201">CS201 — Data Structures</option>
+          <option value="CS101">CS101 — Intro to CS</option>
+          <option value="CS501">CS501 — Advanced Algorithms</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:flex-end">
+        <div style="width:100%">
+          <label>Upload File (any format, max 50MB)</label>
+          <div class="file-zone" id="file-zone" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+            <input type="file" id="s-file" accept="*/*" onchange="onFileChange(event)"/>
+            <span class="icon">📁</span>
+            <span class="hint" id="file-hint">Click or drag &amp; drop your file here</span>
+            <span class="chosen" id="file-chosen" style="display:none"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload progress -->
+    <div class="progress-wrap" id="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="progress-label" id="progress-label">Uploading…</div>
+    </div>
+
+    <button class="btn" id="btn-submit" onclick="doSubmit()">Submit Assignment</button>
+
+    <!-- Receipt -->
+    <div id="receipt-box">
+      <div class="receipt-id" id="r-id"></div>
+      <div style="font-size:.82rem;color:var(--muted)">Official Digital Receipt</div>
+      <div class="receipt-grid">
+        <div class="receipt-item"><div class="r-label">Full Name</div><div class="r-value" id="r-fullname"></div></div>
+        <div class="receipt-item"><div class="r-label">Student ID</div><div class="r-value" id="r-studentid"></div></div>
+        <div class="receipt-item"><div class="r-label">Course</div><div class="r-value" id="r-course"></div></div>
+        <div class="receipt-item"><div class="r-label">Status</div><div class="r-value" id="r-status"></div></div>
+        <div class="receipt-item"><div class="r-label">File</div><div class="r-value" id="r-file"></div></div>
+        <div class="receipt-item"><div class="r-label">Submitted</div><div class="r-value" id="r-time"></div></div>
+      </div>
+      <div style="margin-top:12px;font-size:.82rem;color:var(--green)" id="r-msg"></div>
+    </div>
+    <div id="submit-msg" class="msg"></div>
+  </div>
+
+  <!-- History -->
+  <div class="panel">
+    <h3>Submission History</h3>
+    <p class="sub-label">All your past submissions and receipts.</p>
+    <div id="history-container"><div class="empty">Loading…</div></div>
+  </div>
+</div>
+
+<script src="student-app.js"></script>
+</body>
+</html>

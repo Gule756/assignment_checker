@@ -1,0 +1,42 @@
+[
+  {
+    "receiptId": "RCT-93050930DD8E",
+    "studentId": "STU-2024-001",
+    "courseId": "CS401",
+    "assignmentHash": "a3f1d2e4b9c7f1a2b3c4d5e6f7a8b9cd1e2f3a4b",
+    "status": "ON_TIME",
+    "timestamp": "2026-05-31T12:42:30.611Z",
+    "message": "Assignment received ON TIME. An official digital receipt has been issued.",
+    "submittedAt": "2026-05-31T12:42:30.545Z"
+  },
+  {
+    "receiptId": "RCT-1F57DB05086E",
+    "studentId": "STU-2024-002",
+    "courseId": "CS301",
+    "assignmentHash": "deadbeef1234abcd5678ef90abcdef1234567890",
+    "status": "LATE",
+    "timestamp": "2026-05-31T12:42:31.182Z",
+    "message": "Assignment received AFTER the deadline. Receipt issued with LATE status. Consult your instructor.",
+    "submittedAt": "2026-05-31T12:42:31.182Z"
+  },
+  {
+    "receiptId": "RCT-21DB2CE5E157",
+    "studentId": "STU-2024-004",
+    "courseId": "CS201",
+    "assignmentHash": "https://github.com/student/cs201-assignment",
+    "status": "ON_TIME",
+    "timestamp": "2026-05-31T12:42:32.000Z",
+    "message": "Assignment received ON TIME. An official digital receipt has been issued.",
+    "submittedAt": "2026-05-31T12:42:32.000Z"
+  },
+  {
+    "receiptId": "RCT-9E481EF9B989",
+    "studentId": "S001",
+    "courseId": "CS401",
+    "assignmentHash": "http://localhost:3001/health",
+    "status": "ON_TIME",
+    "timestamp": "2026-05-31T12:58:26.214Z",
+    "message": "Assignment received ON TIME. An official digital receipt has been issued.",
+    "submittedAt": "2026-05-31T12:58:26.207Z"
+  }
+]

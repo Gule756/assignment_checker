@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Instructor GradeBook — Assignment System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #080c18;
+      --surface: #0f1525;
+      --card:    #151c30;
+      --border:  #1e2845;
+      --accent:  #3b82f6;
+      --accent-glow: rgba(59,130,246,.2);
+      --green:   #22d3a5;
+      --yellow:  #fbbf24;
+      --red:     #f87171;
+      --purple:  #a78bfa;
+      --text:    #e2e8f0;
+      --muted:   #64748b;
+      --radius:  12px;
+    }
+
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+    /* ── AUTH ─────────────────────────────────────── */
+    #auth-screen {
+      display:flex; align-items:center; justify-content:center;
+      min-height:100vh; padding:24px;
+    }
+    .auth-wrap { width:100%; max-width:420px; }
+    .brand { text-align:center; margin-bottom:30px; }
+    .brand h1 { font-size:1.8rem; font-weight:700; background:linear-gradient(135deg,#3b82f6,#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .brand p  { color:var(--muted); font-size:.88rem; margin-top:6px; }
+
+    .auth-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:34px 30px; box-shadow:0 30px 70px rgba(0,0,0,.6); }
+
+    .tab-row { display:flex; gap:8px; margin-bottom:26px; }
+    .tab-btn { flex:1; padding:10px; border:1px solid var(--border); background:transparent; color:var(--muted); border-radius:8px; cursor:pointer; font-family:inherit; font-size:.9rem; transition:all .2s; }
+    .tab-btn.active { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
+
+    label { display:block; font-size:.78rem; color:var(--muted); margin-bottom:5px; margin-top:14px; text-transform:uppercase; letter-spacing:.05em; }
+    input { width:100%; padding:11px 13px; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--text); font-family:inherit; font-size:.93rem; outline:none; transition:border-color .2s; }
+    input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow); }
+
+    .btn { width:100%; padding:13px; margin-top:22px; background:linear-gradient(135deg,#3b82f6,#6366f1); border:none; border-radius:8px; color:#fff; font-size:1rem; font-weight:600; font-family:inherit; cursor:pointer; transition:opacity .2s; }
+    .btn:hover { opacity:.88; }
+    .btn:disabled { opacity:.45; cursor:not-allowed; }
+
+    .msg { margin-top:12px; padding:10px 13px; border-radius:8px; font-size:.86rem; display:none; }
+    .msg.error   { background:rgba(248,113,113,.1); border:1px solid var(--red);   color:var(--red);   display:block; }
+    .msg.success { background:rgba(34,211,165,.1);  border:1px solid var(--green); color:var(--green); display:block; }
+
+    /* ── DASHBOARD ────────────────────────────────── */
+    #dashboard { display:none; }
+
+    .topbar {
+      background:var(--surface); border-bottom:1px solid var(--border);
+      padding:16px 28px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
+      position:sticky; top:0; z-index:100;
+    }
+    .topbar-brand { display:flex; align-items:center; gap:10px; }
+    .topbar-brand h2 { font-size:1.1rem; font-weight:700; }
+    .badge-lang { background:rgba(59,130,246,.15); color:var(--accent); padding:3px 10px; border-radius:20px; font-size:.72rem; font-weight:600; }
+
+    .topbar-right { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .user-pill { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:5px 14px; font-size:.83rem; color:var(--muted); }
+    .btn-sm { padding:6px 14px; background:transparent; border:1px solid var(--border); color:var(--muted); border-radius:8px; cursor:pointer; font-family:inherit; font-size:.83rem; transition:all .2s; }
+    .btn-sm:hover { border-color:var(--red); color:var(--red); }
+    .btn-refresh { border-color:var(--accent); color:var(--accent); }
+    .btn-refresh:hover { background:rgba(59,130,246,.1); }
+
+    main { max-width:1100px; margin:0 auto; padding:28px 20px 60px; }
+
+    /* stats row */
+    .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:28px; }
+    @media(max-width:700px){ .stats-row { grid-template-columns:1fr 1fr; } }
+    .stat-card {
+      background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+      padding:20px; text-align:center;
+    }
+    .stat-card .num { font-size:2rem; font-weight:700; line-height:1; }
+    .stat-card .lbl { font-size:.78rem; color:var(--muted); margin-top:4px; text-transform:uppercase; letter-spacing:.05em; }
+    .stat-card.c-total  .num { color:var(--text); }
+    .stat-card.c-ontime .num { color:var(--green); }
+    .stat-card.c-late   .num { color:var(--yellow); }
+    .stat-card.c-reject .num { color:var(--red); }
+
+    /* filters */
+    .filters {
+      background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+      padding:16px 20px; margin-bottom:18px; display:flex; gap:12px; flex-wrap:wrap; align-items:center;
+    }
+    .filters input, .filters select {
+      padding:8px 12px; background:var(--surface); border:1px solid var(--border);
+      border-radius:8px; color:var(--text); font-family:inherit; font-size:.88rem; outline:none;
+    }
+    .filters input:focus, .filters select:focus { border-color:var(--accent); }
+    .filters select option { background:var(--surface); }
+    .filters label { font-size:.82rem; color:var(--muted); margin:0; text-transform:none; }
+
+    /* table */
+    .table-wrap { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+    table { width:100%; border-collapse:collapse; font-size:.86rem; }
+    thead th { padding:12px 16px; text-align:left; color:var(--muted); font-size:.76rem; text-transform:uppercase; letter-spacing:.05em; background:var(--surface); border-bottom:1px solid var(--border); }
+    tbody td { padding:13px 16px; border-bottom:1px solid rgba(255,255,255,.04); }
+    tbody tr:hover { background:rgba(255,255,255,.02); }
+    tbody tr:last-child td { border-bottom:none; }
+
+    .sbadge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:.72rem; font-weight:600; }
+    .sbadge.ON_TIME  { background:rgba(34,211,165,.12); color:var(--green); }
+    .sbadge.LATE     { background:rgba(251,191,36,.12);  color:var(--yellow); }
+    .sbadge.REJECTED { background:rgba(248,113,113,.12); color:var(--red); }
+
+    .btn-dl {
+      padding:5px 12px; background:rgba(59,130,246,.12); border:1px solid rgba(59,130,246,.3);
+      color:var(--accent); border-radius:6px; cursor:pointer; font-family:inherit; font-size:.8rem;
+      text-decoration:none; display:inline-block; transition:all .2s;
+    }
+    .btn-dl:hover { background:rgba(59,130,246,.2); }
+
+    .empty { text-align:center; padding:48px; color:var(--muted); }
+
+    .spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,.25); border-top-color:#fff; border-radius:50%; animation:spin .6s linear infinite; vertical-align:middle; margin-right:5px; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+  </style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+  <div class="auth-wrap">
+    <div class="brand">
+      <h1>🎓 Instructor GradeBook</h1>
+      <p>Assignment Receipt Validation System — Teacher Access</p>
+    </div>
+    <div class="auth-card">
+      <div class="tab-row">
+        <button class="tab-btn active" id="tab-login"    onclick="showTab('login')">Login</button>
+        <button class="tab-btn"        id="tab-register" onclick="showTab('register')">Sign Up</button>
+      </div>
+
+      <div id="form-login">
+        <label>Email</label>
+        <input id="l-email" type="email" placeholder="instructor@university.edu"/>
+        <label>Password</label>
+        <input id="l-pass" type="password" placeholder="••••••••"/>
+        <button class="btn" id="btn-login" onclick="doLogin()">Login</button>
+      </div>
+
+      <div id="form-register" style="display:none">
+        <label>Full Name</label>
+        <input id="r-name"  type="text"     placeholder="Dr. / Prof. Your Name"/>
+        <label>Email</label>
+        <input id="r-email" type="email"    placeholder="instructor@university.edu"/>
+        <label>Password</label>
+        <input id="r-pass"  type="password" placeholder="Min 6 characters"/>
+        <button class="btn" id="btn-register" onclick="doRegister()">Create Teacher Account</button>
+      </div>
+
+      <div id="auth-msg" class="msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <h2>🎓 GradeBook</h2>
+      <span class="badge-lang">HTML + JS</span>
+    </div>
+    <div class="topbar-right">
+      <span class="user-pill" id="user-name">Instructor</span>
+      <button class="btn-sm btn-refresh" onclick="loadAll()">↻ Refresh</button>
+      <button class="btn-sm" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <main>
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card c-total">
+        <div class="num" id="stat-total">—</div>
+        <div class="lbl">Total</div>
+      </div>
+      <div class="stat-card c-ontime">
+        <div class="num" id="stat-ontime">—</div>
+        <div class="lbl">On Time</div>
+      </div>
+      <div class="stat-card c-late">
+        <div class="num" id="stat-late">—</div>
+        <div class="lbl">Late</div>
+      </div>
+      <div class="stat-card c-reject">
+        <div class="num" id="stat-reject">—</div>
+        <div class="lbl">Rejected</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <label>Search:</label>
+      <input id="f-search" type="text" placeholder="Student name or ID…" oninput="applyFilters()"/>
+      <label>Course:</label>
+      <select id="f-course" onchange="applyFilters()">
+        <option value="">All Courses</option>
+        <option>CS101</option><option>CS201</option>
+        <option>CS301</option><option>CS401</option><option>CS501</option>
+      </select>
+      <label>Status:</label>
+      <select id="f-status" onchange="applyFilters()">
+        <option value="">All</option>
+        <option>ON_TIME</option>
+        <option>LATE</option>
+        <option>REJECTED</option>
+      </select>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Receipt ID</th>
+            <th>Student Name / ID</th>
+            <th>Course</th>
+            <th>Status</th>
+            <th>Submitted</th>
+            <th>File Download</th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          <tr><td colspan="8" class="empty">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="row-count" style="text-align:right;color:var(--muted);font-size:.82rem;margin-top:8px;"></div>
+  </main>
+</div>
+
+<script src="instructor-app.js"></script>
+</body>
+</html>
