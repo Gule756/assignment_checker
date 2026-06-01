@@ -8,106 +8,119 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg:      #080c18;
-      --surface: #0f1525;
-      --card:    #151c30;
-      --border:  #1e2845;
-      --accent:  #3b82f6;
-      --accent-glow: rgba(59,130,246,.2);
-      --green:   #22d3a5;
-      --yellow:  #fbbf24;
-      --red:     #f87171;
-      --purple:  #a78bfa;
-      --text:    #e2e8f0;
-      --muted:   #64748b;
-      --radius:  12px;
+      --bg:#080c18; --surface:#0f1525; --card:#151c30; --border:#1e2845;
+      --accent:#3b82f6; --accent-glow:rgba(59,130,246,.2);
+      --green:#22d3a5; --yellow:#fbbf24; --red:#f87171; --purple:#a78bfa;
+      --text:#e2e8f0; --muted:#64748b; --radius:12px;
     }
-
     body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
 
-    /* ── AUTH ─────────────────────────────────────── */
-    #auth-screen {
-      display:flex; align-items:center; justify-content:center;
-      min-height:100vh; padding:24px;
-    }
+    /* AUTH */
+    #auth-screen { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:24px; }
+    #dashboard   { display:none; }
     .auth-wrap { width:100%; max-width:420px; }
     .brand { text-align:center; margin-bottom:30px; }
     .brand h1 { font-size:1.8rem; font-weight:700; background:linear-gradient(135deg,#3b82f6,#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
     .brand p  { color:var(--muted); font-size:.88rem; margin-top:6px; }
-
     .auth-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:34px 30px; box-shadow:0 30px 70px rgba(0,0,0,.6); }
-
     .tab-row { display:flex; gap:8px; margin-bottom:26px; }
     .tab-btn { flex:1; padding:10px; border:1px solid var(--border); background:transparent; color:var(--muted); border-radius:8px; cursor:pointer; font-family:inherit; font-size:.9rem; transition:all .2s; }
     .tab-btn.active { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
-
     label { display:block; font-size:.78rem; color:var(--muted); margin-bottom:5px; margin-top:14px; text-transform:uppercase; letter-spacing:.05em; }
-    input { width:100%; padding:11px 13px; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--text); font-family:inherit; font-size:.93rem; outline:none; transition:border-color .2s; }
-    input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow); }
-
-    .btn { width:100%; padding:13px; margin-top:22px; background:linear-gradient(135deg,#3b82f6,#6366f1); border:none; border-radius:8px; color:#fff; font-size:1rem; font-weight:600; font-family:inherit; cursor:pointer; transition:opacity .2s; }
-    .btn:hover { opacity:.88; }
-    .btn:disabled { opacity:.45; cursor:not-allowed; }
-
+    input, select { width:100%; padding:11px 13px; background:var(--surface); border:1px solid var(--border); border-radius:8px; color:var(--text); font-family:inherit; font-size:.93rem; outline:none; transition:border-color .2s; }
+    input:focus, select:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow); }
+    select option { background:var(--surface); }
+    .btn  { width:100%; padding:13px; margin-top:22px; background:linear-gradient(135deg,#3b82f6,#6366f1); border:none; border-radius:8px; color:#fff; font-size:1rem; font-weight:600; font-family:inherit; cursor:pointer; transition:opacity .2s; }
+    .btn:hover { opacity:.88; } .btn:disabled { opacity:.45; cursor:not-allowed; }
     .msg { margin-top:12px; padding:10px 13px; border-radius:8px; font-size:.86rem; display:none; }
     .msg.error   { background:rgba(248,113,113,.1); border:1px solid var(--red);   color:var(--red);   display:block; }
     .msg.success { background:rgba(34,211,165,.1);  border:1px solid var(--green); color:var(--green); display:block; }
 
-    /* ── DASHBOARD ────────────────────────────────── */
-    #dashboard { display:none; }
-
-    .topbar {
-      background:var(--surface); border-bottom:1px solid var(--border);
-      padding:16px 28px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
-      position:sticky; top:0; z-index:100;
-    }
-    .topbar-brand { display:flex; align-items:center; gap:10px; }
-    .topbar-brand h2 { font-size:1.1rem; font-weight:700; }
+    /* TOPBAR */
+    .topbar { background:var(--surface); border-bottom:1px solid var(--border); padding:16px 28px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; position:sticky; top:0; z-index:100; }
+    .topbar h2 { font-size:1.1rem; font-weight:700; }
     .badge-lang { background:rgba(59,130,246,.15); color:var(--accent); padding:3px 10px; border-radius:20px; font-size:.72rem; font-weight:600; }
-
-    .topbar-right { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
     .user-pill { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:5px 14px; font-size:.83rem; color:var(--muted); }
     .btn-sm { padding:6px 14px; background:transparent; border:1px solid var(--border); color:var(--muted); border-radius:8px; cursor:pointer; font-family:inherit; font-size:.83rem; transition:all .2s; }
     .btn-sm:hover { border-color:var(--red); color:var(--red); }
     .btn-refresh { border-color:var(--accent); color:var(--accent); }
-    .btn-refresh:hover { background:rgba(59,130,246,.1); }
+    .btn-refresh:hover { background:rgba(59,130,246,.1); color:var(--accent); border-color:var(--accent); }
 
-    main { max-width:1100px; margin:0 auto; padding:28px 20px 60px; }
-
-    /* stats row */
-    .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:28px; }
-    @media(max-width:700px){ .stats-row { grid-template-columns:1fr 1fr; } }
-    .stat-card {
+    /* BELL NOTIFICATION */
+    .bell-wrap { position:relative; }
+    .bell-btn { background:transparent; border:1px solid var(--border); border-radius:8px;
+      padding:6px 10px; cursor:pointer; color:var(--muted); font-size:1.1rem;
+      transition:all .2s; line-height:1; }
+    .bell-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .bell-badge { position:absolute; top:-6px; right:-6px; background:var(--red);
+      color:#fff; font-size:.65rem; font-weight:700; min-width:18px; height:18px;
+      border-radius:9px; display:none; align-items:center; justify-content:center;
+      padding:0 4px; border:2px solid var(--bg); animation:pop .2s ease; }
+    .bell-badge.show { display:flex; }
+    @keyframes pop { from{transform:scale(0)} to{transform:scale(1)} }
+    .bell-dropdown { position:absolute; top:calc(100% + 10px); right:0; width:320px;
       background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
-      padding:20px; text-align:center;
-    }
+      box-shadow:0 20px 50px rgba(0,0,0,.6); z-index:200; display:none;
+      max-height:380px; overflow:hidden; flex-direction:column; }
+    .bell-dropdown.open { display:flex; }
+    .bell-drop-head { padding:12px 16px; font-size:.8rem; font-weight:600;
+      color:var(--muted); border-bottom:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between; }
+    .bell-drop-head button { font-size:.72rem; background:transparent; border:none;
+      color:var(--accent); cursor:pointer; font-family:inherit; }
+    .bell-items { overflow-y:auto; flex:1; }
+    .bell-item { padding:12px 16px; border-bottom:1px solid rgba(255,255,255,.04);
+      font-size:.82rem; line-height:1.5; }
+    .bell-item:last-child { border-bottom:none; }
+    .bell-item .bi-name { font-weight:600; color:var(--text); }
+    .bell-item .bi-detail { color:var(--muted); font-size:.76rem; margin-top:2px; }
+    .bell-item .bi-status { font-size:.7rem; font-weight:700; margin-top:3px; }
+    .bell-item .bi-status.LATE    { color:var(--yellow); }
+    .bell-item .bi-status.ON_TIME { color:var(--green); }
+    .bell-empty { padding:28px; text-align:center; color:var(--muted); font-size:.84rem; }
+
+    main { max-width:1150px; margin:0 auto; padding:28px 20px 60px; }
+
+    /* STATS */
+    .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+    @media(max-width:700px){ .stats-row { grid-template-columns:1fr 1fr; } }
+    .stat-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px; text-align:center; }
     .stat-card .num { font-size:2rem; font-weight:700; line-height:1; }
     .stat-card .lbl { font-size:.78rem; color:var(--muted); margin-top:4px; text-transform:uppercase; letter-spacing:.05em; }
-    .stat-card.c-total  .num { color:var(--text); }
-    .stat-card.c-ontime .num { color:var(--green); }
-    .stat-card.c-late   .num { color:var(--yellow); }
-    .stat-card.c-reject .num { color:var(--red); }
+    .c-total .num { color:var(--text); } .c-ontime .num { color:var(--green); }
+    .c-late .num   { color:var(--yellow); } .c-reject .num { color:var(--red); }
 
-    /* filters */
-    .filters {
-      background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
-      padding:16px 20px; margin-bottom:18px; display:flex; gap:12px; flex-wrap:wrap; align-items:center;
-    }
-    .filters input, .filters select {
-      padding:8px 12px; background:var(--surface); border:1px solid var(--border);
-      border-radius:8px; color:var(--text); font-family:inherit; font-size:.88rem; outline:none;
-    }
-    .filters input:focus, .filters select:focus { border-color:var(--accent); }
-    .filters select option { background:var(--surface); }
+    /* DEADLINE PANEL */
+    .panel { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:24px; margin-bottom:20px; }
+    .panel-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+    .panel-header h3 { font-size:1rem; font-weight:600; }
+    .panel-header .badge-new { background:rgba(167,139,250,.15); color:var(--purple); padding:2px 10px; border-radius:20px; font-size:.72rem; font-weight:600; }
+    .deadline-form { display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:12px; align-items:end; }
+    @media(max-width:750px){ .deadline-form { grid-template-columns:1fr; } }
+    .deadline-form label { margin-top:0; }
+    .dl-submit { padding:11px 20px; background:linear-gradient(135deg,#a78bfa,#6366f1); border:none; border-radius:8px; color:#fff; font-weight:600; font-family:inherit; font-size:.9rem; cursor:pointer; transition:opacity .2s; white-space:nowrap; }
+    .dl-submit:hover { opacity:.88; } .dl-submit:disabled { opacity:.45; cursor:not-allowed; }
+
+    /* Deadline list */
+    .dl-list { margin-top:16px; display:flex; flex-direction:column; gap:8px; }
+    .dl-item { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:var(--surface); border:1px solid var(--border); border-radius:8px; flex-wrap:wrap; gap:8px; }
+    .dl-course { font-weight:700; font-size:.9rem; color:var(--accent); margin-right:10px; }
+    .dl-title  { font-size:.82rem; color:var(--muted); }
+    .dl-empty  { text-align:center; padding:20px; color:var(--muted); font-size:.88rem; }
+    .btn-remove { padding:4px 10px; background:transparent; border:1px solid var(--border); color:var(--red); border-radius:6px; cursor:pointer; font-family:inherit; font-size:.76rem; transition:all .2s; }
+    .btn-remove:hover { background:rgba(248,113,113,.1); }
+
+    /* FILTERS */
+    .filters { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:16px 20px; margin-bottom:18px; display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+    .filters input, .filters select { width:auto; padding:8px 12px; font-size:.88rem; flex:1; min-width:140px; }
     .filters label { font-size:.82rem; color:var(--muted); margin:0; text-transform:none; }
 
-    /* table */
+    /* TABLE */
     .table-wrap { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
     table { width:100%; border-collapse:collapse; font-size:.86rem; }
-    thead th { padding:12px 16px; text-align:left; color:var(--muted); font-size:.76rem; text-transform:uppercase; letter-spacing:.05em; background:var(--surface); border-bottom:1px solid var(--border); }
-    tbody td { padding:13px 16px; border-bottom:1px solid rgba(255,255,255,.04); }
+    thead th { padding:12px 14px; text-align:left; color:var(--muted); font-size:.75rem; text-transform:uppercase; letter-spacing:.05em; background:var(--surface); border-bottom:1px solid var(--border); }
+    tbody td { padding:13px 14px; border-bottom:1px solid rgba(255,255,255,.04); }
     tbody tr:hover { background:rgba(255,255,255,.02); }
     tbody tr:last-child td { border-bottom:none; }
 
@@ -116,52 +129,39 @@
     .sbadge.LATE     { background:rgba(251,191,36,.12);  color:var(--yellow); }
     .sbadge.REJECTED { background:rgba(248,113,113,.12); color:var(--red); }
 
-    .btn-dl {
-      padding:5px 12px; background:rgba(59,130,246,.12); border:1px solid rgba(59,130,246,.3);
-      color:var(--accent); border-radius:6px; cursor:pointer; font-family:inherit; font-size:.8rem;
-      text-decoration:none; display:inline-block; transition:all .2s;
-    }
-    .btn-dl:hover { background:rgba(59,130,246,.2); }
+    .btn-dl { padding:5px 12px; background:rgba(59,130,246,.12); border:1px solid rgba(59,130,246,.3); color:var(--accent); border-radius:6px; cursor:pointer; font-family:inherit; font-size:.8rem; transition:all .2s; }
+    .btn-dl:hover { background:rgba(59,130,246,.22); }
 
     .empty { text-align:center; padding:48px; color:var(--muted); }
-
     .spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,.25); border-top-color:#fff; border-radius:50%; animation:spin .6s linear infinite; vertical-align:middle; margin-right:5px; }
     @keyframes spin { to{transform:rotate(360deg)} }
   </style>
 </head>
 <body>
 
-<!-- AUTH SCREEN -->
+<!-- AUTH -->
 <div id="auth-screen">
   <div class="auth-wrap">
     <div class="brand">
-      <h1>🎓 Instructor GradeBook</h1>
-      <p>Assignment Receipt Validation System — Teacher Access</p>
+      <h1>Instructor GradeBook</h1>
+      <p>Assignment Submission System — Teacher Access</p>
     </div>
     <div class="auth-card">
       <div class="tab-row">
         <button class="tab-btn active" id="tab-login"    onclick="showTab('login')">Login</button>
         <button class="tab-btn"        id="tab-register" onclick="showTab('register')">Sign Up</button>
       </div>
-
       <div id="form-login">
-        <label>Email</label>
-        <input id="l-email" type="email" placeholder="instructor@university.edu"/>
-        <label>Password</label>
-        <input id="l-pass" type="password" placeholder="••••••••"/>
+        <label>Email</label><input id="l-email" type="email" placeholder="instructor@university.edu"/>
+        <label>Password</label><input id="l-pass" type="password" placeholder="••••••••"/>
         <button class="btn" id="btn-login" onclick="doLogin()">Login</button>
       </div>
-
       <div id="form-register" style="display:none">
-        <label>Full Name</label>
-        <input id="r-name"  type="text"     placeholder="Dr. / Prof. Your Name"/>
-        <label>Email</label>
-        <input id="r-email" type="email"    placeholder="instructor@university.edu"/>
-        <label>Password</label>
-        <input id="r-pass"  type="password" placeholder="Min 6 characters"/>
+        <label>Full Name</label><input id="r-name"  type="text"     placeholder="Dr. / Prof. Your Name"/>
+        <label>Email</label>    <input id="r-email" type="email"    placeholder="instructor@university.edu"/>
+        <label>Password</label> <input id="r-pass"  type="password" placeholder="Min 6 characters"/>
         <button class="btn" id="btn-register" onclick="doRegister()">Create Teacher Account</button>
       </div>
-
       <div id="auth-msg" class="msg"></div>
     </div>
   </div>
@@ -170,13 +170,27 @@
 <!-- DASHBOARD -->
 <div id="dashboard">
   <div class="topbar">
-    <div class="topbar-brand">
-      <h2>🎓 GradeBook</h2>
-      <span class="badge-lang">HTML + JS</span>
+    <div style="display:flex;align-items:center;gap:10px">
+      <h2>GradeBook</h2>
+      <span class="badge-lang">JavaScript</span>
     </div>
-    <div class="topbar-right">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
       <span class="user-pill" id="user-name">Instructor</span>
-      <button class="btn-sm btn-refresh" onclick="loadAll()">↻ Refresh</button>
+      <!-- Bell notification icon -->
+      <div class="bell-wrap" id="bell-wrap">
+        <button class="bell-btn" onclick="toggleBell()" title="Notifications">&#128276;</button>
+        <span class="bell-badge" id="bell-badge">0</span>
+        <div class="bell-dropdown" id="bell-dropdown">
+          <div class="bell-drop-head">
+            <span>New Submissions</span>
+            <button onclick="markAllSeen()">Mark all seen</button>
+          </div>
+          <div class="bell-items" id="bell-items">
+            <div class="bell-empty">No new submissions.</div>
+          </div>
+        </div>
+      </div>
+      <button class="btn-sm btn-refresh" onclick="loadAll()">Refresh</button>
       <button class="btn-sm" onclick="doLogout()">Logout</button>
     </div>
   </div>
@@ -184,21 +198,44 @@
   <main>
     <!-- Stats -->
     <div class="stats-row">
-      <div class="stat-card c-total">
-        <div class="num" id="stat-total">—</div>
-        <div class="lbl">Total</div>
+      <div class="stat-card c-total">  <div class="num" id="stat-total">—</div>  <div class="lbl">Total</div></div>
+      <div class="stat-card c-ontime"> <div class="num" id="stat-ontime">—</div> <div class="lbl">On Time</div></div>
+      <div class="stat-card c-late">   <div class="num" id="stat-late">—</div>   <div class="lbl">Late</div></div>
+      <div class="stat-card c-reject"> <div class="num" id="stat-reject">—</div> <div class="lbl">Rejected</div></div>
+    </div>
+
+    <!-- Deadline Management -->
+    <div class="panel">
+      <div class="panel-header">
+        <h3>Deadline Management</h3>
+        <span class="badge-new">Teacher Only</span>
       </div>
-      <div class="stat-card c-ontime">
-        <div class="num" id="stat-ontime">—</div>
-        <div class="lbl">On Time</div>
+      <div class="deadline-form">
+        <div>
+          <label>Course</label>
+          <select id="d-course">
+            <option value="CS401">CS401 — Design Patterns</option>
+            <option value="CS301">CS301 — Software Engineering</option>
+            <option value="CS201">CS201 — Data Structures</option>
+            <option value="CS101">CS101 — Intro to CS</option>
+            <option value="CS501">CS501 — Advanced Algorithms</option>
+          </select>
+        </div>
+        <div>
+          <label>Title (optional)</label>
+          <input id="d-title" type="text" placeholder="e.g. Project Phase 1"/>
+        </div>
+        <div>
+          <label>Deadline Date &amp; Time</label>
+          <input id="d-datetime" type="datetime-local"/>
+        </div>
+        <div>
+          <button class="dl-submit" id="btn-deadline" onclick="setDeadline()">Set Deadline</button>
+        </div>
       </div>
-      <div class="stat-card c-late">
-        <div class="num" id="stat-late">—</div>
-        <div class="lbl">Late</div>
-      </div>
-      <div class="stat-card c-reject">
-        <div class="num" id="stat-reject">—</div>
-        <div class="lbl">Rejected</div>
+      <div id="deadline-msg" class="msg" style="margin-top:12px"></div>
+      <div class="dl-list" id="deadlines-list">
+        <div class="dl-empty">No deadlines set yet.</div>
       </div>
     </div>
 
@@ -215,9 +252,7 @@
       <label>Status:</label>
       <select id="f-status" onchange="applyFilters()">
         <option value="">All</option>
-        <option>ON_TIME</option>
-        <option>LATE</option>
-        <option>REJECTED</option>
+        <option>ON_TIME</option><option>LATE</option><option>REJECTED</option>
       </select>
     </div>
 
@@ -226,13 +261,9 @@
       <table>
         <thead>
           <tr>
-            <th>#</th>
-            <th>Receipt ID</th>
-            <th>Student Name / ID</th>
-            <th>Course</th>
-            <th>Status</th>
-            <th>Submitted</th>
-            <th>File Download</th>
+            <th>#</th><th>Receipt ID</th><th>Student Name / ID</th>
+            <th>Course</th><th>Status</th><th>Submitted</th>
+            <th>File</th><th>Download</th>
           </tr>
         </thead>
         <tbody id="table-body">

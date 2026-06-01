@@ -1,17 +1,10 @@
-/**
- * ================================================================
- *  ValidationStrategy.js — Strategy Pattern
- * ================================================================
- *  Pattern : STRATEGY (Behavioral GoF)
- *  Intent  : Define a family of algorithms (validation rules),
- *            encapsulate each one, and make them interchangeable.
- *
- *  Strategies:
- *    HashStrategy   — validates a hex hash string
- *    UrlStrategy    — validates an http/https file URL
- *    AnyRefStrategy — accepts any non-empty reference
- * ================================================================
- */
+/* Strategy pattern: this encapsulates each validation algorithm — URL check,
+   hex-hash check, or any-reference check — into its own class so they can
+   be swapped at runtime through ValidationContext.setStrategy(). The submission
+   route never contains an if/else chain for validation; it just calls
+   context.validate(ref) and the active strategy handles the logic. Adding
+   a new file-reference type only requires a new class here with no changes
+   to any other file. */
 
 class HashStrategy {
   validate(ref) {
@@ -46,13 +39,12 @@ class AnyRefStrategy {
   get name() { return 'AnyRef'; }
 }
 
-/** Context: holds and applies the active strategy */
 class ValidationContext {
   constructor(strategy = new AnyRefStrategy()) {
     this._strategy = strategy;
   }
   setStrategy(strategy) { this._strategy = strategy; }
-  validate(ref) { return this._strategy.validate(ref); }
+  validate(ref)  { return this._strategy.validate(ref); }
   get strategyName() { return this._strategy.name; }
 }
 

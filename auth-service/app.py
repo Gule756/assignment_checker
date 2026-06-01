@@ -1,25 +1,7 @@
-"""
-================================================================
-  auth-service/app.py  —  Subsystem: Auth & Notification
-================================================================
-  Language   : Python 3
-  Framework  : Flask
-  Platform   : HTTP Microservice (port 5001)
-  Run with   : python app.py
-
-  Responsibilities:
-    • POST /auth/register  — create student or teacher account
-    • POST /auth/login     — verify credentials, return JWT
-    • POST /auth/notify    — receive notification from Node.js, print it
-    • GET  /auth/health    — service status
-
-  Design Patterns:
-    [1] SINGLETON   — Database pool (one instance per process)
-    [2] FACTORY     — UserFactory creates Student or Teacher objects
-    [3] DECORATOR   — @require_json validates request bodies
-    [4] OBSERVER    — NotificationLogger observes submission events
-================================================================
-"""
+# auth-service/app.py — Auth & Notification Service (Python 3 / Flask, port 5001)
+# Patterns used in this file:
+#   Singleton (Database), Factory Method (UserFactory),
+#   Decorator (@require_json), Observer (NotificationLogger)
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -39,51 +21,66 @@ JWT_SECRET = "ASSIGNMENT_SYSTEM_JWT_SECRET_2024"
 JWT_ALGO   = "HS256"
 
 
-# ================================================================
-# PATTERN 1: SINGLETON — Database Connection Pool
-# ================================================================
+# Singleton pattern: Database._instance starts as None and is created only
+# once on the first call to get_pool(). Every route and helper that needs the
+# database calls Database.query() and reaches the same pool object. That keeps
+# the connection count low and prevents the cloud DB limit from being exceeded
+# no matter how many requests arrive at the same time.
 class Database:
-    """
-    Singleton: only one connection pool is ever created.
-    All auth routes share the same pool instance.
-    """
     _instance = None
 
     @classmethod
     def get_pool(cls):
         if cls._instance is None:
             cls._instance = psycopg2.pool.SimpleConnectionPool(
-                minconn=1, maxconn=10, dsn=DB_URL
+                minconn=1, maxconn=10, dsn=DB_URL,
+                keepalives=1, keepalives_idle=30,
+                keepalives_interval=10, keepalives_count=5
             )
             print("[Database] OK - Singleton pool created")
         return cls._instance
 
     @classmethod
     def query(cls, sql, params=(), fetch=False):
-        """Execute a query, auto-manage connection lifecycle."""
-        pool = cls.get_pool()
-        conn = pool.getconn()
-        try:
-            with conn.cursor() as cur:
-                cur.execute(sql, params)
-                conn.commit()
-                if fetch == "one":
-                    return cur.fetchone()
-                if fetch == "all":
-                    return cur.fetchall()
-                return None
-        except Exception:
-            conn.rollback()
-            raise
-        finally:
-            pool.putconn(conn)
+        """Execute a query. Retries once if SSL connection was dropped."""
+        for attempt in range(2):
+            pool = cls.get_pool()
+            conn = pool.getconn()
+            try:
+                with conn.cursor() as cur:
+                    cur.execute(sql, params)
+                    conn.commit()
+                    result = None
+                    if fetch == "one":
+                        result = cur.fetchone()
+                    elif fetch == "all":
+                        result = cur.fetchall()
+                pool.putconn(conn)
+                return result
+            except (psycopg2.OperationalError, psycopg2.InterfaceError):
+                # Stale connection — close it, reset pool, retry once
+                try:
+                    pool.putconn(conn, close=True)
+                except Exception:
+                    pass
+                cls._instance = None
+                if attempt == 1:
+                    raise
+            except Exception:
+                try:
+                    conn.rollback()
+                    pool.putconn(conn)
+                except Exception:
+                    pass
+                raise
 
 
-# ================================================================
-# PATTERN 2: FACTORY — UserFactory
-# ================================================================
+# Factory Method pattern: UserFactory.create() inspects the role field of a
+# database row and returns either a StudentUser or TeacherUser object. The
+# login and register routes never instantiate those classes directly, so
+# adding a new role in the future requires only a new class and one line
+# inside create() with no other files changed.
 class StudentUser:
-    """Concrete product: a student user object."""
     def __init__(self, row):
         self.id    = row[0]
         self.name  = row[1]
@@ -121,16 +118,15 @@ class UserFactory:
         return StudentUser(row)
 
 
-# ================================================================
-# PATTERN 3: DECORATOR — @require_json
-# ================================================================
 from functools import wraps
 
+# Decorator pattern: @require_json wraps any route function and checks that
+# all listed fields are present in the request body before the real function
+# runs. If a field is missing the decorator returns a 400 error immediately.
+# That removes boilerplate validation from every route and lets each handler
+# focus only on its business logic — adding a new required field means
+# updating only the decorator argument, not the function body.
 def require_json(*fields):
-    """
-    Decorator Pattern: validates that required JSON fields exist
-    in the request body before the route function runs.
-    """
     def decorator(fn):
         @wraps(fn)
         def wrapper(*args, **kwargs):
@@ -145,15 +141,13 @@ def require_json(*fields):
     return decorator
 
 
-# ================================================================
-# PATTERN 4: OBSERVER — NotificationLogger
-# ================================================================
+# Observer pattern: NotificationLogger is the subject that holds a list of
+# observer functions. When Node.js POSTs a submission event to /auth/notify,
+# NotificationLogger.notify() calls every subscribed function with the event
+# data. terminal_observer is the first subscriber and prints an alert to the
+# console. A second observer — email, SMS, or database log — can be added with
+# one NotificationLogger.subscribe() call and zero changes to existing code.
 class NotificationLogger:
-    """
-    Observer: listens for submission events and logs them
-    to the terminal. Additional observers can be attached
-    (e.g., email sender) without changing the publisher.
-    """
     _observers = []
 
     @classmethod
