@@ -11,8 +11,7 @@ const path       = require('path');
 const multer     = require('multer');
 const { EventEmitter } = require('events');
 const { authMiddleware, teacherOnly } = require('./middleware/auth');
-const SubmissionService   = require('./SubmissionService');
-const DeadlineService     = require('./DeadlineService');
+const SubmissionFacade    = require('./SubmissionFacade');
 const notificationAdapter = require('./NotificationAdapter');
 
 const app  = express();
@@ -61,7 +60,7 @@ app.post('/api/submissions', authMiddleware, upload.single('file'), async (req, 
   }
 
   try {
-    const submission = await SubmissionService.create({
+    const submission = await SubmissionFacade.createSubmission({
       studentId,
       studentName,
       courseId,
@@ -83,8 +82,8 @@ app.get('/api/submissions', authMiddleware, async (req, res) => {
   try {
     const { id: userId, role } = req.user;
     const submissions = role === 'teacher'
-      ? await SubmissionService.getAll()
-      : await SubmissionService.getForStudent(userId);
+      ? await SubmissionFacade.getAllSubmissions()
+      : await SubmissionFacade.getSubmissionsForStudent(userId);
     res.json({ submissions });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -94,7 +93,7 @@ app.get('/api/submissions', authMiddleware, async (req, res) => {
 // ── GET /api/submissions/stats ────────────────────────────────────
 app.get('/api/submissions/stats', authMiddleware, async (req, res) => {
   try {
-    res.json(await SubmissionService.getStats());
+    res.json(await SubmissionFacade.getStats());
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -103,7 +102,7 @@ app.get('/api/submissions/stats', authMiddleware, async (req, res) => {
 // ── GET /api/submissions/:receiptId ──────────────────────────────
 app.get('/api/submissions/:receiptId', authMiddleware, async (req, res) => {
   try {
-    const sub = await SubmissionService.getByReceiptId(req.params.receiptId);
+    const sub = await SubmissionFacade.getSubmissionByReceiptId(req.params.receiptId);
     if (!sub) return res.status(404).json({ error: 'Receipt not found' });
     res.json(sub);
   } catch (err) {
@@ -114,7 +113,7 @@ app.get('/api/submissions/:receiptId', authMiddleware, async (req, res) => {
 // ── GET /api/download/:receiptId — teacher downloads from Neon ────
 app.get('/api/download/:receiptId', authMiddleware, teacherOnly, async (req, res) => {
   try {
-    const sub = await SubmissionService.getByReceiptIdWithFile(req.params.receiptId);
+    const sub = await SubmissionFacade.getSubmissionWithFile(req.params.receiptId);
     if (!sub)           return res.status(404).json({ error: 'Submission not found' });
     if (!sub.file_data) return res.status(404).json({ error: 'No file stored for this submission' });
 

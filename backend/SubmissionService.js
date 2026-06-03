@@ -1,14 +1,10 @@
-/* Facade pattern: this hides the full complexity of creating a submission —
-   deadline checking, SHA-256 receipt generation, binary file storage in
-   Neon PostgreSQL, and firing the Observer event — behind a single
-   SubmissionService.create() call. Routes stay clean and simple; they
-   never need to know about crypto, BYTEA inserts, or event buses.
-   The same facade also wraps every query the system makes against the
-   submissions table so that SQL never leaks into route handlers. */
+/* SubmissionService is a repository-style module that encapsulates all
+   SQL access for the submissions table. It hides database details from
+   higher-level code, but does not itself implement the full submission
+   workflow. The true facade is SubmissionFacade, which orchestrates
+   deadline checks, receipt generation, storage, and notification. */
 
-const crypto = require('crypto');
 const Database = require('./db');
-const DeadlineService = require('./DeadlineService');
 
 async function initTable() {
   await Database.query(`
@@ -45,32 +41,13 @@ initTable().catch(err => console.error('[DB] submissions init error:', err.messa
 
 class SubmissionService {
 
-  static async create(data, eventBus) {
+  static async insertSubmission(data) {
     const {
-      studentId, studentName, courseId,
+      receiptId, studentId, studentName, courseId,
       fullName, studentNumber,
       fileBuffer, originalFilename, mimeType,
+      status, message,
     } = data;
-
-    if (!courseId)        throw new Error('Course ID is required');
-    if (!fullName)        throw new Error('Full name is required');
-    if (!studentNumber)   throw new Error('Student ID number is required');
-    if (!fileBuffer)      throw new Error('File is required');
-
-    let status = 'ON_TIME';
-    let message = 'Assignment received on time. Official digital receipt issued.';
-    const deadline = await DeadlineService.getForCourse(courseId);
-    if (deadline && new Date() > new Date(deadline.deadline_at)) {
-      status  = 'LATE';
-      message = 'Assignment received AFTER the deadline. Receipt issued but submission is late.';
-    }
-
-    const receiptId = 'RCT-' + crypto
-      .createHash('sha256')
-      .update(`${studentId}${courseId}${originalFilename}${Date.now()}`)
-      .digest('hex')
-      .substring(0, 12)
-      .toUpperCase();
 
     const result = await Database.query(
       `INSERT INTO submissions
@@ -84,20 +61,7 @@ class SubmissionService {
        studentNumber, originalFilename, mimeType, fileBuffer, status, message]
     );
 
-    const submission = result.rows[0];
-
-    if (eventBus) {
-      eventBus.emit('submission', {
-        receiptId,
-        studentName: fullName,
-        courseId,
-        status,
-        studentNumber,
-        file: originalFilename,
-      });
-    }
-
-    return submission;
+    return result.rows[0];
   }
 
   static async getAll() {
